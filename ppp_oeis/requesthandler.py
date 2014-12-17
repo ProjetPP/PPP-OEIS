@@ -1,5 +1,6 @@
 """Request handler of the module."""
 
+import re
 import logging
 import requests
 import functools
@@ -12,6 +13,8 @@ from .oeis import OEISEntry, ParseError
 
 logger = logging.Logger('ppp_oeis')
 
+sequence_re = re.compile('[0-9]+[, ]+[0-9]+[, ]+[0-9, ]+')
+
 @functools.lru_cache(1024)
 def query(logger, q):
     s = requests.get('http://oeis.org/search',
@@ -20,6 +23,8 @@ def query(logger, q):
 
 def sequence_to_resource(entry, cut=''):
     return Resource(', '.join(map(str, entry['sequence'])).split(cut, 1)[1])
+def name_to_resource(entry, cut=''):
+    return Resource(entry['name'])
 
 class RequestHandler:
     def __init__(self, request):
@@ -40,8 +45,20 @@ class RequestHandler:
         return responses
 
     def on_following(self):
-        q = self.request.tree.subject.value.replace(' ', ',')
-        cut = self.request.tree.subject.value.replace(' ', ', ') + ', '
-        l = query(logger, q)
-        return map(lambda x:sequence_to_resource(x, cut), l[1])
+        v = self.request.tree.subject.value
+        if not sequence_re.match(v):
+            return []
+        q = v.replace(' ', ',')
+        cut = v.replace(' ', ', ') + ', '
+        (_, l) = query(logger, q)
+        return map(lambda x:sequence_to_resource(x, cut), l)
+
+    def on_definition(self):
+        v = self.request.tree.subject.value
+        if not sequence_re.match(v):
+            return []
+        q = v.replace(' ', ',')
+        cut = v.replace(' ', ', ') + ', '
+        (_, l) = query(logger, q)
+        return map(lambda x:name_to_resource(x, cut), l)
 
