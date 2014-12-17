@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ppp_oeis',
-    version='0.1',
+    version='0.1.1',
     description='PPP module answering questions about integer sequences.',
     url='https://github.com/ProjetPP',
     author='Valentin Lorentz',

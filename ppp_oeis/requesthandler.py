@@ -7,7 +7,8 @@ import functools
 from io import StringIO
 
 from ppp_libmodule.exceptions import ClientError
-from ppp_datamodel import Triple, Resource, Response, TraceItem
+from ppp_datamodel import Triple, Resource, Sentence, Missing
+from ppp_datamodel import Response, TraceItem
 
 from .oeis import OEISEntry, ParseError
 
@@ -31,12 +32,18 @@ class RequestHandler:
         self.request = request
 
     def answer(self):
-        if not isinstance(self.request.tree, Triple):
+        if isinstance(self.request.tree, Triple) and \
+                isinstance(self.request.tree.object, Missing):
+            method = getattr(self, 'on_' + self.request.tree.predicate.value, None)
+            value = self.request.tree.subject.value
+        elif isinstance(self.request.tree, Sentence):
+            method = self.on_definition
+            value = self.request.tree.value.strip('?')
+        else:
             return []
-        method = getattr(self, 'on_' + self.request.tree.predicate.value, None)
         if not method:
             return []
-        l = method()
+        l = method(value)
 
         meas = {'relevance': 1, 'accuracy': 1}
         responses = map(lambda tree:Response('en', tree, meas,
@@ -44,8 +51,7 @@ class RequestHandler:
                         l)
         return responses
 
-    def on_following(self):
-        v = self.request.tree.subject.value
+    def on_following(self, v):
         if not sequence_re.match(v):
             return []
         q = v.replace(' ', ',')
@@ -53,8 +59,7 @@ class RequestHandler:
         (_, l) = query(logger, q)
         return map(lambda x:sequence_to_resource(x, cut), l)
 
-    def on_definition(self):
-        v = self.request.tree.subject.value
+    def on_definition(self, v):
         if not sequence_re.match(v):
             return []
         q = v.replace(' ', ',')

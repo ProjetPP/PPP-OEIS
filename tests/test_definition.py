@@ -1,4 +1,4 @@
-from ppp_datamodel import Missing, Triple, Resource
+from ppp_datamodel import Missing, Triple, Resource, Sentence
 from ppp_datamodel.communication import Request, TraceItem, Response
 from ppp_libmodule.tests import PPPTestCase
 from ppp_oeis import app
@@ -17,3 +17,13 @@ class TestDefinition(PPPTestCase(app)):
         r = self.request(q)
         self.assertEqual(r, [])
 
+    def testSentence(self):
+        q = Request('1', 'en', Sentence('1, 2, 4, 8'), {}, [])
+        r = self.request(q)
+        self.assertGreater(len(r), 1, r)
+        self.assertEqual(r[0].tree.value, 'Powers of 2: a(n) = 2^n.')
+
+        q = Request('1', 'en', Sentence('1, 2, 4, 8?'), {}, [])
+        r = self.request(q)
+        self.assertGreater(len(r), 1, r)
+        self.assertEqual(r[0].tree.value, 'Powers of 2: a(n) = 2^n.')
