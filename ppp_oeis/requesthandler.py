@@ -33,6 +33,8 @@ class RequestHandler:
 
     def answer(self):
         if isinstance(self.request.tree, Triple) and \
+                isinstance(self.request.tree.subject, Resource) and \
+                isinstance(self.request.tree.predicate, Resource) and \
                 isinstance(self.request.tree.object, Missing):
             method = getattr(self, 'on_' + self.request.tree.predicate.value, None)
             value = self.request.tree.subject.value
