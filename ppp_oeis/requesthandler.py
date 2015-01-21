@@ -28,7 +28,10 @@ def graph_for_entry(entry):
              '@id': 'http:' + url,
              'type': 'Thing',
              'name': entry['name'],
-             'url': url,
+             'description': [
+                 {'language': 'en', '@value': x}
+                 for x in entry['comments']
+                 ],
              'potentialAction': {
                  '@type': 'ViewAction',
                  'image': '//oeis.org/favicon.ico',

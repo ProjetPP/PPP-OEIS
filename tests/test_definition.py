@@ -13,7 +13,6 @@ class TestDefinition(PPPTestCase(app)):
         self.assertEqual(r[0].tree.value, 'Powers of 2: a(n) = 2^n.')
         self.assertEqual(r[0].tree.graph['name'], 'Powers of 2: a(n) = 2^n.')
         self.assertEqual(r[0].tree.graph['@id'], 'http://oeis.org/A000079')
-        self.assertEqual(r[0].tree.graph['url'], '//oeis.org/A000079')
 
     def testNoAnswer(self):
         q = Request('1', 'en', Triple(Resource('1 2'), Resource('definition'), Missing()), {}, [])
