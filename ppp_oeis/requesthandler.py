@@ -7,7 +7,7 @@ import functools
 from io import StringIO
 
 from ppp_libmodule.exceptions import ClientError
-from ppp_datamodel import Triple, Resource, Sentence, Missing
+from ppp_datamodel import Triple, Resource, Sentence, Missing, JsonldResource
 from ppp_datamodel import Response, TraceItem
 
 from .oeis import OEISEntry, ParseError
@@ -22,10 +22,37 @@ def query(logger, q):
                      params={'fmt': 'text', 'q': q}).text
     return OEISEntry.query(logger=logger, fd=StringIO(s))
 
+def graph_for_entry(entry):
+    url = '//oeis.org/%s' % entry['id']
+    graph = {'@context': 'http://schema.org',
+             '@id': 'http:' + url,
+             'type': 'Thing',
+             'name': entry['name'],
+             'description': [
+                 {'language': 'en', '@value': x}
+                 for x in entry['comments']
+                 ],
+             'potentialAction': {
+                 '@type': 'ViewAction',
+                 'image': '//oeis.org/favicon.ico',
+                 'target': url,
+                 'name': [
+                     {'@language': 'en',
+                      '@value': 'View on OEIS'},
+                     {'@language': 'fr',
+                      '@value': 'Voir sur OEIS'},
+                     ]
+                 },
+           }
+    return graph
+
 def sequence_to_resource(entry, cut=''):
-    return Resource(', '.join(map(str, entry['sequence'])).split(cut, 1)[1])
+    value = ', '.join(map(str, entry['sequence'])).split(cut, 1)[1]
+    graph = graph_for_entry(entry)
+    return JsonldResource(value, graph=graph)
 def name_to_resource(entry, cut=''):
-    return Resource(entry['name'])
+    graph = graph_for_entry(entry)
+    return JsonldResource(entry['name'], graph=graph)
 
 class RequestHandler:
     def __init__(self, request):
