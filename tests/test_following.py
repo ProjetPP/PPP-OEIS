@@ -11,6 +11,9 @@ class TestFollowing(PPPTestCase(app)):
         r = self.request(q)
         self.assertGreater(len(r), 1, r)
         self.assertTrue(r[0].tree.value.startswith('16, 32, 64'), r[0])
+        self.assertEqual(r[0].tree.graph['name'], 'Powers of 2: a(n) = 2^n.')
+        self.assertEqual(r[0].tree.graph['@id'], 'http://oeis.org/A000079')
+        self.assertEqual(r[0].tree.graph['url'], '//oeis.org/A000079')
 
     def testNoAnswer(self):
         q = Request('1', 'en', Triple(Resource('1 2'), Resource('following'), Missing()), {}, [])
