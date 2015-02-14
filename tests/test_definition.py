@@ -1,4 +1,4 @@
-from ppp_datamodel import Missing, Triple, Resource, Sentence
+from ppp_datamodel import Missing, Triple, Resource, Sentence, List
 from ppp_datamodel.communication import Request, TraceItem, Response
 from ppp_libmodule.tests import PPPTestCase
 from ppp_oeis import app
@@ -13,6 +13,11 @@ class TestDefinition(PPPTestCase(app)):
         self.assertEqual(r[0].tree.value, 'Powers of 2: a(n) = 2^n.')
         self.assertEqual(r[0].tree.graph['name'], 'Powers of 2: a(n) = 2^n.')
         self.assertEqual(r[0].tree.graph['@id'], 'http://oeis.org/A000079')
+
+    def testMultiplePredicates(self):
+        q = Request('1', 'en', Triple(Resource('1 2 4 8'), List([Resource('definition'), Resource('foo')]), Missing()), {}, [])
+        r = self.request(q)
+        self.assertGreater(len(r), 1, r)
 
     def testNoAnswer(self):
         q = Request('1', 'en', Triple(Resource('1 2'), Resource('definition'), Missing()), {}, [])

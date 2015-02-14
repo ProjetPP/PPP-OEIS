@@ -61,9 +61,12 @@ class RequestHandler:
     def answer(self):
         if isinstance(self.request.tree, Triple) and \
                 isinstance(self.request.tree.subject, Resource) and \
-                isinstance(self.request.tree.predicate, Resource) and \
                 isinstance(self.request.tree.object, Missing):
-            method = getattr(self, 'on_' + self.request.tree.predicate.value, None)
+            # TODO: actually traverse the tree (+ less ugly code)
+            for predicate in self.request.tree.predicate_set:
+                method = getattr(self, 'on_' + predicate.value, None)
+                if method is not None:
+                    break
             value = self.request.tree.subject.value
         elif isinstance(self.request.tree, Sentence):
             method = self.on_definition
