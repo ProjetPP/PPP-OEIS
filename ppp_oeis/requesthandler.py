@@ -29,7 +29,7 @@ def graph_for_entry(entry):
              '@type': 'Thing',
              'name': entry['name'],
              'description': [
-                 {'language': 'en', '@value': x}
+                 {'@language': 'en', '@value': x}
                  for x in entry['comments']
                  ],
              'potentialAction': {
