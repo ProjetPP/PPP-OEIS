@@ -26,7 +26,7 @@ def graph_for_entry(entry):
     url = '//oeis.org/%s' % entry['id']
     graph = {'@context': 'http://schema.org',
              '@id': 'http:' + url,
-             'type': 'Thing',
+             '@type': 'Thing',
              'name': entry['name'],
              'description': [
                  {'language': 'en', '@value': x}
