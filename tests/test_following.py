@@ -14,7 +14,7 @@ class TestFollowing(PPPTestCase(app)):
         self.assertEqual(r[0].tree.graph['name'], 'Powers of 2: a(n) = 2^n.')
         self.assertEqual(r[0].tree.graph['@id'], 'http://oeis.org/A000079')
         self.assertEqual(r[0].tree.graph['description'][0],
-                {'@value': '2^0 = 1 is the only odd power of 2.', 'language': 'en'})
+                {'@value': '2^0 = 1 is the only odd power of 2.', '@language': 'en'})
 
     def testNoAnswer(self):
         q = Request('1', 'en', Triple(Resource('1 2'), Resource('following'), Missing()), {}, [])
